@@ -76,6 +76,9 @@
   manual_cpp_binding: True
   variants: method
 
+- func : TestOperation(Tensor q, Tensor k, Tensor v) -> (Tensor, Tensor)
+  variants: function
+
 - func: _version(Tensor self) -> int
   manual_cpp_binding: True
   variants: method
