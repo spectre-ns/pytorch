@@ -162,7 +162,7 @@ def ref_TestOperation(q, k, v):
     """
     reference implementation utilizing numpy subfunctions
     """
-    x = np.matmul(q, k.transpose(0, 1))
+    x = np.matmul(q, k.T)
     a = np.tanh(x)
     o = np.matmul(a, v)
     return o, a
@@ -9182,7 +9182,10 @@ def sample_inputs_scaled_dot_product_attention(op_info, device, dtype, requires_
 
 
 def sample_inputs_TestOperation(op_info, device, dtype, requires_grad, **kwargs):
-    pass
+    q = torch.rand(2, 3, dtype=dtype, requires_grad=requires_grad, device= device)
+    k = torch.rand(2, 3, dtype=dtype, requires_grad=requires_grad, device= device)
+    v = torch.rand(2, 4, dtype=dtype, requires_grad=requires_grad, device= device)
+    return [SampleInput(q, args = (k,v))]
 
 def sample_inputs_efficient_attention_forward(op_info, device, dtype, requires_grad, **kwargs):
     make = partial(make_tensor, device=device, dtype=dtype, requires_grad=requires_grad)
@@ -17387,11 +17390,14 @@ op_db: list[OpInfo] = [
                          device_type='cuda', dtypes=(torch.bfloat16, torch.float16, torch.float32),
                          active_if=TEST_WITH_ROCM and PLATFORM_SUPPORTS_MEM_EFF_ATTENTION),),
     ),
+    #refernece 
+    #backwards
+    #dtypes
     OpInfo('TestOperation',
         ref = ref_TestOperation,
         #op=lambda *args, **kwargs: wrapper_set_seed(torch.TestOperation, *args, **kwargs), #torch.<name>
         sample_inputs_func=sample_inputs_TestOperation,  # TODO: Make this main from python_api.py 
-        dtypes=floating_types(),  # support floating types only for now 
+        dtypes=floating_and_complex_types_and(torch.bfloat16, torch.float16),  # support floating types only for now
         supports_out=False,
         supports_forward_ad=False,
         supports_fwgrad_bwgrad=True,
