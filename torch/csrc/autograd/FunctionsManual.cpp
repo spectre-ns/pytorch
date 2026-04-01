@@ -44,6 +44,33 @@ using at::Scalar;
 using at::Tensor;
 using at::TensorList;
 
+  // Backward pass C++ kernel
+  std::tuple<Tensor, Tensor, Tensor> TestOperation_2_backward(
+  const Tensor& grad_o, const Tensor& grad_a_extra,
+  const Tensor& q, const Tensor& k, const Tensor& v, const Tensor& a) 
+  {
+      // 1. grad_a = (grad_o @ v.T) + grad_a_extra
+
+      auto grad_a = at::matmul(grad_o, v.transpose(0, 1));
+
+      if(grad_a_extra.defined())
+        grad_a = at::add(grad_a, grad_a_extra);
+
+      // 2. grad_x = grad_a * (1 - a^2)
+      auto grad_x = at::mul(grad_a, at::sub(at::mul(a, a), 1.0));
+      
+      // 3. grad_q = grad_x @ k
+      auto grad_q = at::matmul(grad_x, k);
+      
+      // 4. grad_k = grad_x.T @ q
+      auto grad_k = at::matmul(grad_x.transpose(0, 1), q);
+      
+      // 5. grad_v = a.T @ grad_o
+      auto grad_v = at::matmul(a.transpose(0, 1), grad_o);
+      
+      return std::make_tuple(std::move(grad_q), std::move(grad_k), std::move(grad_v));
+  }
+
 const char* kCudnnDoubleBackwardMsg =
     "Double backwards is not supported for CuDNN RNNs due to limitations in the CuDNN API. To run double backwards, please disable the CuDNN backend temporarily while running the forward pass of your RNN. For example: \nwith torch.backends.cudnn.flags(enabled=False):\n    output = model(inputs)";
 

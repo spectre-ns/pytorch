@@ -79,6 +79,12 @@
 - func : TestOperation(Tensor q, Tensor k, Tensor v) -> (Tensor, Tensor)
   variants: function
 
+# V2: Use Composite Explicit, now we need to define gradients
+- func: TestOperation_2(Tensor q, Tensor k, Tensor v) -> (Tensor o, Tensor a)
+  variants: function
+  dispatch:
+    CompositeExplicitAutograd: TestOperation_2
+
 - func: _version(Tensor self) -> int
   manual_cpp_binding: True
   variants: method

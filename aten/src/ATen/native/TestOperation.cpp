@@ -3,6 +3,9 @@
 #include <ATen/Tensor.h>
 #include <ATen/ops/matmul.h>
 #include <ATen/ops/tanh.h>
+#include <ATen/ops/add.h>
+#include <ATen/ops/mul.h>
+#include <ATen/ops/sub.h>
 
 
 namespace at::native
@@ -13,5 +16,10 @@ namespace at::native
         auto a = at::tanh(x);
         auto o = at::matmul(a, v);
         return std::make_tuple(o, a);
+    }
+
+    std::tuple<Tensor, Tensor> TestOperation_2(const Tensor& q, const Tensor& k, const Tensor& v) 
+    {
+        return at::native::TestOperation(q,k,v);
     }
 }

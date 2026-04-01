@@ -14,6 +14,10 @@
 
 namespace torch::autograd::generated::details {
 
+std::tuple<at::Tensor, at::Tensor, at::Tensor> TestOperation_2_backward(
+  const at::Tensor& grad_o, const at::Tensor& grad_a_extra,
+  const at::Tensor& q, const at::Tensor& k, const at::Tensor& v, const at::Tensor& a);
+
 extern const char* kCudnnDoubleBackwardMsg;
 
 // A simple way to imperatively compute index ranges for slots
