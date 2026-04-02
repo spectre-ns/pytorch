@@ -85,6 +85,15 @@
   dispatch:
     CompositeExplicitAutograd: TestOperation_2
 
+# V3: Use Composite Explicit, now we need to define gradients
+- func: test_operation_3.out(Tensor q, Tensor k, Tensor v, *, Tensor(a!) out0, Tensor(b!) out1) -> (Tensor(a!), Tensor(b!))
+  structured: True
+  dispatch:
+    CPU, CUDA: test_operation_3_out
+
+- func: test_operation_3.Tensor(Tensor q, Tensor k, Tensor v) -> (Tensor, Tensor)
+  structured_delegate: test_operation_3.out
+
 - func: _version(Tensor self) -> int
   manual_cpp_binding: True
   variants: method
